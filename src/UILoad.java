@@ -20,7 +20,7 @@ public class UILoad extends generalPanel{
 		pane.setOpaque(true);
 		try{
 			FilenameFilter f = new EndsWithFilter( ".sav" );
-			String[] filenames = new File( "save\\" ).list(f);
+			String[] filenames = new File( "save/" ).list(f);
 			load=addButton(pane, "img/exit/okay.png", "img/exit/h_okay.png",290,445);
 			cancel=addButton(pane, "img/exit/cancel.png", "img/exit/h_cancel.png",430,445);
 			if(filenames==null || filenames.length==0)

@@ -188,18 +188,20 @@ class ABC extends Thread{
 			}
 		return maxFit;
 		}
-	private Bee neighborhoodSearch(int i){
+	private Bee neighborhoodSearch(int i) {
 		int j=rand.nextInt(maxEmptyCell), k=rand.nextInt(employedSize);
-		while(k==i)									//while k=i, look for another k
-			k=rand.nextInt(employedSize);
+		while(k==i)	k=rand.nextInt(employedSize);
 
 		int xij=bee[i].getSolution()[emptyCell[j][0]][emptyCell[j][1]][0], xkj=bee[k].getSolution()[emptyCell[j][0]][emptyCell[j][1]][0];
 		int neededNum[]=subgrid[emptyCell[j][2]].getNeededNum();
 		int vij=neededNum[(int)Math.ceil(xij+Math.abs(rand.nextDouble()*(xij-xkj)))%neededNum.length];
-		Bee newBee=new Bee(subgrid);
+
+        Bee newBee=new Bee(subgrid);
 		newBee.swap(bee[i].getCopy(), emptyCell[j][2], emptyCell[j][0], emptyCell[j][1], xij, vij);
-		return newBee;
-		}
+
+        return newBee;
+    }
+
 	protected void decompose(){
 		for(int ctr=0; ctr<employedSize; ctr++)
 			bee[ctr]=null;

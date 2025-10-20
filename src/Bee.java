@@ -37,26 +37,25 @@ class Bee{
 			System.out.println("");
 			}
 		}
-	protected int getPenaltyValue(){
+	protected int getPenaltyValue() {
 		int penalty=0;
 		customSet hor=new customSet();
 		customSet ver=new customSet();
-		for(int ctr=0; ctr<solution.length; ctr++){
+
+        for (int ctr=0; ctr<solution.length; ctr++) {
 			hor.clear();
 			ver.clear();
 			for(int ct=0; ct<solution.length; ct++){
-				if(hor.contains(solution[ctr][ct][0]))
-					penalty++;
-				else
-					hor.add(Integer.valueOf(solution[ctr][ct][0]));
-				if(ver.contains(solution[ct][ctr][0]))
-					penalty++;
-				else
-					ver.add(solution[ct][ctr][0]);
-				}
-			}
-		return penalty;
-		}
+				if(hor.contains(solution[ctr][ct][0])) penalty++;
+				else hor.add(Integer.valueOf(solution[ctr][ct][0]));
+
+                if(ver.contains(solution[ct][ctr][0])) penalty++;
+				else ver.add(solution[ct][ctr][0]);
+            }
+        }
+        return penalty;
+    }
+
 	protected int[][][] getSolution(){
 		return solution;
 		}
