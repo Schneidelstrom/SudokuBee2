@@ -1,11 +1,9 @@
 import javax.swing.JPanel;
-import javax.swing.JLabel;
 import javax.swing.JButton;
 import java.awt.Cursor;
 
 public class UIBoard{
 	private JPanel pane;
-	private JLabel board;
 	private int sudokuArray[][][];
 	private int size, startX, startY, inc, btnX, btnY, ans;
 	protected JButton btn[][];
@@ -58,22 +56,24 @@ public class UIBoard{
 
         btn=new JButton[size][size];
 
-        for (int ctr=0, X=startX, Y=startY; ctr<size; ctr++, Y+=inc, X=startX) {
-			for (int count=0; count<size; count++, X+=inc){
-				String img="normal";
+        for (int ctr = 0, Y = startY; ctr < size; ctr++, Y += inc) {
+            for (int count = 0, X = startX; count < size; count++, X += inc) {
+                String backgroundFile = getBackgroundImage(ctr, count, size);
+				
+                gp.addLabel(pane, "img/board/" + "/" + backgroundFile, X, Y, inc, inc);
 
-                if (sudokuArray[ctr][count][1]==0) img="given";
+                String imgType = (sudokuArray[ctr][count][1] == 0) ? "given" : "normal";
+                String numberImagePath = "img/box/" + size + "x" + size + "/" + imgType + "/" + sudokuArray[ctr][count][0] + ".png";
+                btn[ctr][count] = gp.gameButton(pane, numberImagePath, X, Y, inc, inc);
 
-                btn[ctr][count]=gp.gameButton(pane, "img/box/"+size+"x"+size+"/"+img+"/"+sudokuArray[ctr][count][0]+".png", X, Y);
+				pane.setComponentZOrder(btn[ctr][count], 0);
 
-                if(setCursor && img.equals("normal")) btn[ctr][count].setCursor(new Cursor(12));
-				else btn[ctr][count].setCursor(new Cursor(0));
+                if (setCursor && imgType.equals("normal")) btn[ctr][count].setCursor(new Cursor(Cursor.HAND_CURSOR));
+                else btn[ctr][count].setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
 
-                if(sudokuArray[ctr][count][0]!=0) ans++;
+                if (sudokuArray[ctr][count][0] != 0) ans++;
             }
         }
-
-        board=gp.addLabel(pane,"img/board/"+size+"x"+size+".png",0,84);
     }
 
 	protected JButton getButton(){
@@ -129,9 +129,17 @@ public class UIBoard{
 		}
 	protected void decompose(){
 		pane.removeAll();
-		board=null;
 		sudokuArray=null;
 		btn=null;
 		gp=null;
-		}
 	}
+	
+	private String getBackgroundImage(int row, int col, int size) {
+        int subgridDim = (int) Math.sqrt(size);
+        if (subgridDim == 0) return "1.png";
+        int subgridRow = row / subgridDim;
+        int subgridCol = col / subgridDim;
+        if ((subgridRow + subgridCol) % 2 == 0) return "1.png";
+        else return "2.png";
+    }
+}

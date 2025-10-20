@@ -24,6 +24,7 @@ import javax.swing.SpinnerDateModel;
 import javax.swing.ListCellRenderer;
 import java.awt.Container;
 import java.awt.Font;
+import java.awt.Image;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.FileDialog;
@@ -105,14 +106,14 @@ public class generalPanel{
 		pix=null;
 		return label;
 		}
-	protected JLabel addLabel(Container pane, String string,int x, int y, int width, int height){
+	/*protected JLabel addLabel(Container pane, String string,int x, int y, int width, int height){
 		JLabel label= new JLabel(string);
 		pane.add(label);
 		label.setBounds(x, y,width, height);
 		label.setFont(new Font("Arial", Font.PLAIN, 12));
 		label.setForeground(Color.black);
 		return label;
-		}
+		}*/
 	protected JLabel addLabel(Container pane, String string,Color color,int x, int y, int width, int height, int alignment){
 		JLabel label= new JLabel(string, alignment);
 		pane.add(label);
@@ -139,6 +140,24 @@ public class generalPanel{
 		label.setVisible(false);
 		return label;
 		}
+	
+	protected JLabel addLabel(Container pane, String pix, int x, int y, int width, int height) {
+		Icon img = createScaledIcon(pix, width, height);
+		JLabel label= new JLabel();
+		label.setIcon(img);
+		pane.add(label);
+		label.setBounds(x, y, width, height);
+		return label;
+	}
+	protected JLabel addInvisibleLabel(Container pane, String string, int x, int y, int width, int height){
+		Icon img = createScaledIcon(string, width, height);
+		JLabel label= new JLabel();
+		label.setVisible(false);
+		label.setIcon(img);
+		pane.add(label);
+		label.setBounds(x, y, width, height);
+		return label;
+	}
 //JButton
 	protected JButton addButton(Container pane, String string, int x, int y, int width, int height){
 		JButton button=new JButton(string);
@@ -159,11 +178,12 @@ public class generalPanel{
 		button.setBounds(x,y,img.getIconWidth(),img.getIconHeight());
 		return button;
 		}
-	protected JButton gameButton(Container pane, String string,int x, int y){
-		Icon img=new ImageIcon(string);
+	protected JButton gameButton(Container pane, String string, int x, int y, int width, int height){
+		Icon img = createScaledIcon(string, width, height); //New
 		JButton button=new JButton(img);
 		pane.add(button);
-		button.setBounds(x,y,img.getIconWidth(),img.getIconHeight());
+		button.setBounds(x, y, width, height);
+		//button.setBounds(x,y,img.getIconWidth(),img.getIconHeight());
 		button.setContentAreaFilled(false);
 		button.setBorderPainted(false);
 		button.setBorder(null);
@@ -445,5 +465,12 @@ public class generalPanel{
 		}
 	protected void sop(Object obj){
 		System.out.println(obj+"");
-		}
 	}
+	protected ImageIcon createScaledIcon(String path, int width, int height) {
+        ImageIcon originalIcon = new ImageIcon(path);
+        if (width <= 0 || height <= 0) return originalIcon;
+        Image originalImage = originalIcon.getImage();
+        Image scaledImage = originalImage.getScaledInstance(width, height, Image.SCALE_SMOOTH);
+        return new ImageIcon(scaledImage);
+    }
+}
