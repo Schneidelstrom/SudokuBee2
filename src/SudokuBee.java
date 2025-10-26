@@ -27,7 +27,8 @@ public class SudokuBee extends Thread{
 	private JFrame frame=new JFrame();
 	private Container container=frame.getContentPane();
 	private String saveFileName="";
-	SudokuBee(){
+	
+	SudokuBee() {
 		frame.setTitle(" Sudoku Bee");
 		snd=new Tunog("snd/1.mid");
 		error=new Tunog("snd/error.wav");
@@ -39,10 +40,12 @@ public class SudokuBee extends Thread{
 		frame.setLocationRelativeTo(null);
 		frame.setResizable(false);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		}
-	private void menu(){
+	}
+
+	private void menu() {
 		GP=new generalPanel(container);
-		GP.play.addActionListener(new ActionListener(){
+
+		GP.play.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e){
 				mainGame();
 				status("");
@@ -55,24 +58,25 @@ public class SudokuBee extends Thread{
 				generate=true;
 				gameMode=true;
 				isSolved=false;
-				try{
+				try {
 					start();
-					}
-				catch(Exception ee){
+				} catch (Exception ee) {
 					start=true;
-					}
-				popUp(size);
 				}
-			});
-		GP.open.addActionListener(new ActionListener(){
-			public void actionPerformed(ActionEvent e){
+			popUp(size);	
+			}
+		});
+
+		GP.open.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
 				GP.setVisibleButton(false);
                 int size = getBoardSizeFromOptions();
 				isSolved=false;
 				board(new int[size][size][2], true);
 				loadSudoku(7);
-				}
-			});
+			}
+		});
+
 		GP.create.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e){
 				mainGame();
