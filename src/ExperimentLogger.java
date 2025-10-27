@@ -12,7 +12,6 @@ public class ExperimentLogger {
     public ExperimentLogger() {
         try {
             new java.io.File("experiments").mkdirs();
-            new java.io.File("save").mkdirs();
 
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd_HHmmss");
             this.timestamp = dateFormat.format(new Date());
@@ -34,7 +33,6 @@ public class ExperimentLogger {
         writer.println("=======================================");
         writer.println("    SUDOKU BEE - EXPERIMENT REPORT     ");
         writer.println("=======================================");
-        writer.println("Timestamp: " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
         writer.println();
         writer.println("----- ALGORITHM PARAMETERS -----");
         writer.println("Penalty Function: " + penaltyType.toString());
@@ -44,11 +42,6 @@ public class ExperimentLogger {
         writer.println();
         writer.println("----- INITIAL PUZZLE -----");
         writer.println(formatSudokuGrid(initialPuzzle));
-
-        String saveFilename = "save/initial" + this.timestamp + ".sav";
-        saveSudokuToFile(initialPuzzle, saveFilename);
-        writer.println("\nInitial puzzle saved to: " + saveFilename);
-
         writer.flush();
     }
 
@@ -72,10 +65,6 @@ public class ExperimentLogger {
             writer.println("A perfect solution was not found. Displaying the best attempt:");
             writer.println(formatSudokuGrid(finalSolution));
         }
-
-        String saveFilename = "save/solved" + this.timestamp + ".sav";
-        saveSudokuToFile(finalSolution, saveFilename);
-        writer.println("\nFinal solution saved to: " + saveFilename);
 
         writer.flush();
     }
@@ -112,33 +101,6 @@ public class ExperimentLogger {
             sb.append("\n");
         }
         return sb.toString();
-    }
-
-    private void saveSudokuToFile(int[][][] sudokuArray, String filePath) {
-        if (sudokuArray == null) {
-            System.err.println("Attempted to save a null Sudoku grid. Aborting save for: " + filePath);
-            return;
-        }
-        try (PrintWriter print = new PrintWriter(new FileWriter(filePath))) {
-            print.println(sudokuArray.length);
-            for (int x = 0; x < sudokuArray.length; x++) {
-                StringBuilder numBuilder = new StringBuilder();
-                StringBuilder typeBuilder = new StringBuilder();
-                for (int y = 0; y < sudokuArray.length; y++) {
-                    numBuilder.append(sudokuArray[x][y][0]).append(" ");
-                    typeBuilder.append(sudokuArray[x][y][1]).append(" ");
-                }
-                print.println(numBuilder.toString());
-                print.println(typeBuilder.toString());
-            }
-            System.out.println("Successfully saved Sudoku to " + filePath);
-        } catch (IOException e) {
-            System.err.println("Error saving Sudoku to file: " + filePath);
-            e.printStackTrace();
-            if(writer != null) {
-                writer.println("\n!!! FAILED TO SAVE SUDOKU TO " + filePath + " !!!");
-            }
-        }
     }
 
     private boolean validateSolution(int[][][] solution) {

@@ -67,11 +67,17 @@ public class SudokuBee extends Thread{
 			}
 		});
 
-		GP.create.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				GP.setVisibleButton(false);
-				launchGenerationConfig(false);
-			}
+		GP.create.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e){
+				mainGame();
+				isAns=false;
+				int size=(options.sz+2)*3;
+				isSolved=false;
+				board(new int[size][size][2], true);
+				game.setVisible(false);
+				status("create");
+				popUp(size);
+				}
 		});
 		GP.options.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {

@@ -75,54 +75,44 @@ class Bee{
 	}
 	
 	private int getPenaltySumProduct(boolean checkSubgrids) {
-        long totalPenalty = 0;
         int size = solution.length;
         if (size == 0) return 0;
 
-        long expectedSum = (long) size * (size + 1) / 2;
-        BigInteger expectedProduct = BigInteger.ONE;
-        for (int i = 1; i <= size; i++) {
-            expectedProduct = expectedProduct.multiply(BigInteger.valueOf(i));
-        }
+        BigInteger totalPenalty = BigInteger.ZERO;
 
         for (int i = 0; i < size; i++) {
-            long rowSum = 0;
             BigInteger rowProduct = BigInteger.ONE;
-            long colSum = 0;
             BigInteger colProduct = BigInteger.ONE;
 
             for (int j = 0; j < size; j++) {
-                rowSum += solution[i][j][0];
                 rowProduct = rowProduct.multiply(BigInteger.valueOf(solution[i][j][0]));
-                colSum += solution[j][i][0];
                 colProduct = colProduct.multiply(BigInteger.valueOf(solution[j][i][0]));
             }
-            totalPenalty += Math.abs(rowSum - expectedSum);
-            totalPenalty += (rowProduct.subtract(expectedProduct)).abs().longValue();
-            totalPenalty += Math.abs(colSum - expectedSum);
-            totalPenalty += (colProduct.subtract(expectedProduct)).abs().longValue();
+            totalPenalty = totalPenalty.add(rowProduct);
+            totalPenalty = totalPenalty.add(colProduct);
         }
 
         if (checkSubgrids) {
             for (int i = 0; i < subgrid.length; i++) {
                 Subgrid grid = subgrid[i];
-                long subgridSum = 0;
                 BigInteger subgridProduct = BigInteger.ONE;
                 for (int y = grid.getStartY(), limY = y + grid.getDimY(); y < limY; y++) {
                     for (int x = grid.getStartX(), limX = x + grid.getDimX(); x < limX; x++) {
-                        subgridSum += solution[y][x][0];
+                        if (solution[y][x][0] == 0) {
+                             subgridProduct = BigInteger.ZERO;
+                             break;
+                        }
                         subgridProduct = subgridProduct.multiply(BigInteger.valueOf(solution[y][x][0]));
                     }
+                    if (subgridProduct.equals(BigInteger.ZERO)) break;
                 }
-                totalPenalty += Math.abs(subgridSum - expectedSum);
-                totalPenalty += (subgridProduct.subtract(expectedProduct)).abs().longValue();
+                totalPenalty = totalPenalty.add(subgridProduct);
             }
         }
 
-        if (totalPenalty < 0 || totalPenalty > Integer.MAX_VALUE) {
-            return Integer.MAX_VALUE;
-        }
-        return (int) totalPenalty;
+        if (totalPenalty.compareTo(BigInteger.valueOf(Integer.MAX_VALUE)) > 0) return Integer.MAX_VALUE;
+        
+		return totalPenalty.intValue();
     }
 
 	protected void copyProblem(int[][][] prob) {
