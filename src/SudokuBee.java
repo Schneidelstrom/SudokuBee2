@@ -7,7 +7,9 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
+import java.io.FilenameFilter;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 
 public class SudokuBee extends Thread{
@@ -59,25 +61,36 @@ public class SudokuBee extends Thread{
 
 		GP.open.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				GP.setVisibleButton(false);
+				/*GP.setVisibleButton(false);
 				int size = getBoardSizeFromOptions();
 				isSolved = false;
 				board(new int[size][size][2], true);
-				loadSudoku(7);
+				loadSudoku(7);*/
+				int confirmation = JOptionPane.showConfirmDialog(
+						frame,
+						"This will run a full batch experiment on all .sav files in the 'save' directory.\n" +
+								"The process may take a very long time and will generate many log files.\n\n" +
+								"Do you want to proceed?",
+						"Confirm Batch Experiment",
+						JOptionPane.YES_NO_OPTION);
+
+				if (confirmation == JOptionPane.YES_OPTION) {
+					Thread experimentThread = new Thread(SudokuBee.this::runBatchExperiment);
+					experimentThread.start();
+				}
 			}
 		});
-
-		GP.create.addActionListener(new ActionListener(){
-			public void actionPerformed(ActionEvent e){
+		GP.create.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
 				mainGame();
-				isAns=false;
-				int size=(options.sz+2)*3;
-				isSolved=false;
+				isAns = false;
+				int size = (options.sz + 2) * 3;
+				isSolved = false;
 				board(new int[size][size][2], true);
 				game.setVisible(false);
 				status("create");
 				popUp(size);
-				}
+			}
 		});
 		GP.options.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -98,6 +111,87 @@ public class SudokuBee extends Thread{
 			}
 		});
 	}
+	
+	    private void runBatchExperiment() {
+        // Step 1: Inform the user that the process is starting.
+        JOptionPane.showMessageDialog(frame, "Starting batch experiment... The application may seem unresponsive.\n" +
+                "A confirmation will be shown when the process is complete.", "Process Started", JOptionPane.INFORMATION_MESSAGE);
+
+        // Step 2: Find all .sav files in the 'save' directory.
+        File saveDir = new File("save/");
+        if (!saveDir.exists() || !saveDir.isDirectory()) {
+            JOptionPane.showMessageDialog(frame, "Error: 'save' directory not found.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        FilenameFilter savFilter = new EndsWithFilter(".sav");
+        String[] savFiles = saveDir.list(savFilter);
+
+        if (savFiles == null || savFiles.length == 0) {
+            JOptionPane.showMessageDialog(frame, "No .sav files found in the 'save' directory to test.", "No Files Found", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        System.out.println("Starting batch experiment with the following files: " + Arrays.toString(savFiles));
+        
+        // Define standard parameters for the solver runs.
+        final int REPETITIONS = 5;
+        final int EMPLOYED_BEES = 100;
+        final int ONLOOKER_BEES = 200;
+        final int MAX_CYCLES = 100000; // A reasonable limit for automated runs.
+
+        // Step 3: The main automation loop.
+        try {
+            for (String savFilename : savFiles) {
+                for (PenaltyType penalty : PenaltyType.values()) {
+                    for (int rep = 1; rep <= REPETITIONS; rep++) {
+                        System.out.println(">>> Running: [" + savFilename + "] - Penalty: [" + penalty + "] - Repetition: [" + rep + "/" + REPETITIONS + "]");
+                        
+                        // Load the Sudoku puzzle from the file.
+                        LoadSudoku puzzleLoader = new LoadSudoku("save/" + savFilename);
+                        if (!puzzleLoader.getStatus()) {
+                            System.err.println("    SKIPPING: Could not load or validate " + savFilename);
+                            continue; // Skip to the next iteration if the file is invalid.
+                        }
+                        int[][][] puzzle = puzzleLoader.getArray();
+
+                        // Each run gets its own logger for a clean, timestamped report.
+                        String baseFilename = savFilename.replace(".sav", "") + "-" + rep;
+                        ExperimentLogger logger = new ExperimentLogger(baseFilename);
+                        
+                        // Log initial state.
+                        logger.logInitialState(puzzle, penalty, EMPLOYED_BEES, ONLOOKER_BEES, MAX_CYCLES);
+
+                        // Configure and run the ABC solver.
+                        // We use a dummy PrintResult since the detailed logging is now in ExperimentLogger.
+                        PrintResult dummyCyclePrinter = new PrintResult("results/temp_cycle_log.xls");
+                        ABC abc = new ABC(dummyCyclePrinter, puzzle, EMPLOYED_BEES, ONLOOKER_BEES, MAX_CYCLES, penalty);
+
+                        // Run the algorithm synchronously within this thread.
+                        double startTime = dummyCyclePrinter.getTime();
+                        abc.run(); // This is a blocking call.
+                        double endTime = dummyCyclePrinter.getTime();
+                        double seconds = (endTime - startTime) / 1000.0;
+                        
+                        // Log the final results.
+                        logger.logFinalResult(abc.getBestSolution(), abc.getFitness(), Integer.parseInt(abc.getCycles()), seconds);
+                        
+                        // Clean up.
+                        logger.close();
+                        dummyCyclePrinter.delete();
+                    }
+                }
+            }
+        } catch (Exception e) {
+            // Catch any unexpected errors during the long run.
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(frame, "An unexpected error occurred during the batch experiment: \n" + e.getMessage(), "Experiment Failed", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        // Step 4: Inform the user that the process is complete.
+        JOptionPane.showMessageDialog(frame, "Batch experiment complete!\nAll logs have been saved in the 'experiments' directory.", "Process Finished", JOptionPane.INFORMATION_MESSAGE);
+        System.out.println("<<< Batch experiment finished successfully. >>>");
+    }
 	
 	private void launchGenerationConfig(boolean isAutoGenerateMode) {
         GP.setVisible(0);
@@ -507,13 +601,10 @@ public class SudokuBee extends Thread{
 				SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd_HHmmss");
 				String cycleLogFile = "results/result_" + dateFormat.format(new Date()) + ".xls";
 				PrintResult cyclePrinter = new PrintResult(cycleLogFile);
-				ExperimentLogger summaryLogger = new ExperimentLogger();
 
 				status.setVisible(false);
 
 				int[][][] initialPuzzle = board.getSudokuArray();
-
-				summaryLogger.logInitialState(initialPuzzle, selectedPenaltyType, numEmp, numOnlook, numCycle);
 
 				ABC abc = new ABC(cyclePrinter, initialPuzzle, numEmp, numOnlook, numCycle, selectedPenaltyType);
 
@@ -529,12 +620,6 @@ public class SudokuBee extends Thread{
 
 				double endTime = cyclePrinter.getTime();
 				double seconds = ((endTime - startTime) / 1000);
-
-				summaryLogger.logFinalResult(abc.getBestSolution(), abc.getFitness(), Integer.parseInt(abc.getCycles()),
-						seconds);
-
-				cyclePrinter.close();
-				summaryLogger.close();
 
 				game.setVisible(0);
 				GP.setVisible(5);
@@ -552,12 +637,6 @@ public class SudokuBee extends Thread{
 				abc.decompose();
 				abc = null;
 				status.setVisible(true);
-
-				try {
-					Desktop.getDesktop().open(new File(summaryLogger.getFilename()));
-				} catch (Exception ee) {
-					System.err.println("Could not open experiment log file automatically.");
-				}
 			}
 			game.setVisible(0);
 			start = false;

@@ -1,26 +1,21 @@
 import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 public class ExperimentLogger {
     private PrintWriter writer;
-    private String filename;
-    private String timestamp;
+    private String baseFilename;
 
-    public ExperimentLogger() {
+    public ExperimentLogger(String baseFilename) {
+        this.baseFilename = baseFilename;
         try {
             new java.io.File("experiments").mkdirs();
 
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd_HHmmss");
-            this.timestamp = dateFormat.format(new Date());
+            String reportFilename = "experiments/" + this.baseFilename + ".txt";
 
-            this.filename = "experiments/experiment_" + this.timestamp + ".txt";
-
-            FileWriter fw = new FileWriter(this.filename, false);
+            FileWriter fw = new FileWriter(reportFilename, false);
             this.writer = new PrintWriter(fw);
-            System.out.println("Experiment log will be saved to: " + this.filename);
+            System.out.println("    -> Experiment log will be saved to: " + reportFilename);
 
         } catch (IOException e) {
             System.err.println("Error initializing ExperimentLogger: " + e.getMessage());
@@ -76,7 +71,7 @@ public class ExperimentLogger {
     }
     
     public String getFilename() {
-        return this.filename;
+        return "experiments/" + this.baseFilename + ".txt";
     }
 
     private String formatSudokuGrid(int[][][] grid) {
