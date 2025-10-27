@@ -46,7 +46,6 @@ public class UIBoard{
                 startX = 8;
                 startY = 86;
                 break;
-            case 9:
             default:
                 inc = 56;
                 startX = 12;

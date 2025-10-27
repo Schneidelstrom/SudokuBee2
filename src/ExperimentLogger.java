@@ -7,14 +7,18 @@ import java.util.Date;
 public class ExperimentLogger {
     private PrintWriter writer;
     private String filename;
+    private String timestamp;
 
     public ExperimentLogger() {
         try {
-            new java.io.File("results").mkdirs();
+            new java.io.File("experiments").mkdirs();
+            new java.io.File("save").mkdirs();
 
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd_HHmmss");
-            this.filename = "results/experiment_" + dateFormat.format(new Date()) + ".txt";
-            
+            this.timestamp = dateFormat.format(new Date());
+
+            this.filename = "experiments/experiment_" + this.timestamp + ".txt";
+
             FileWriter fw = new FileWriter(this.filename, false);
             this.writer = new PrintWriter(fw);
             System.out.println("Experiment log will be saved to: " + this.filename);
@@ -40,6 +44,11 @@ public class ExperimentLogger {
         writer.println();
         writer.println("----- INITIAL PUZZLE -----");
         writer.println(formatSudokuGrid(initialPuzzle));
+
+        String saveFilename = "save/initial" + this.timestamp + ".sav";
+        saveSudokuToFile(initialPuzzle, saveFilename);
+        writer.println("\nInitial puzzle saved to: " + saveFilename);
+
         writer.flush();
     }
 
@@ -49,6 +58,10 @@ public class ExperimentLogger {
         writer.println("----- EXPERIMENT RESULTS -----");
         writer.println("Termination Reason: " + (fitness == 1.0 ? "Solution Found" : "Max Cycles Reached"));
         writer.println("Final Fitness: " + String.format("%.6f", fitness));
+
+        boolean isSolutionValid = validateSolution(finalSolution);
+        writer.println("Solution Validity: " + (isSolutionValid ? "VALID" : "INVALID"));
+
         writer.println("Total Cycles Executed: " + cycles);
         writer.println("Total Runtime: " + String.format("%.3f", runtimeSeconds) + " seconds");
         writer.println();
@@ -59,6 +72,11 @@ public class ExperimentLogger {
             writer.println("A perfect solution was not found. Displaying the best attempt:");
             writer.println(formatSudokuGrid(finalSolution));
         }
+
+        String saveFilename = "save/solved" + this.timestamp + ".sav";
+        saveSudokuToFile(finalSolution, saveFilename);
+        writer.println("\nFinal solution saved to: " + saveFilename);
+
         writer.flush();
     }
 
@@ -94,5 +112,65 @@ public class ExperimentLogger {
             sb.append("\n");
         }
         return sb.toString();
+    }
+
+    private void saveSudokuToFile(int[][][] sudokuArray, String filePath) {
+        if (sudokuArray == null) {
+            System.err.println("Attempted to save a null Sudoku grid. Aborting save for: " + filePath);
+            return;
+        }
+        try (PrintWriter print = new PrintWriter(new FileWriter(filePath))) {
+            print.println(sudokuArray.length);
+            for (int x = 0; x < sudokuArray.length; x++) {
+                StringBuilder numBuilder = new StringBuilder();
+                StringBuilder typeBuilder = new StringBuilder();
+                for (int y = 0; y < sudokuArray.length; y++) {
+                    numBuilder.append(sudokuArray[x][y][0]).append(" ");
+                    typeBuilder.append(sudokuArray[x][y][1]).append(" ");
+                }
+                print.println(numBuilder.toString());
+                print.println(typeBuilder.toString());
+            }
+            System.out.println("Successfully saved Sudoku to " + filePath);
+        } catch (IOException e) {
+            System.err.println("Error saving Sudoku to file: " + filePath);
+            e.printStackTrace();
+            if(writer != null) {
+                writer.println("\n!!! FAILED TO SAVE SUDOKU TO " + filePath + " !!!");
+            }
+        }
+    }
+
+    private boolean validateSolution(int[][][] solution) {
+        if (solution == null) return false;
+        try {
+            Subgrid[] subgrids = createSubgrids(solution.length);
+            Validator validator = new Validator(solution, subgrids);
+            return validator.checkAnswer();
+        } catch (Exception e) {
+            System.err.println("An error occurred during final solution validation.");
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    private Subgrid[] createSubgrids(int size) {
+        if (size <= 0) return new Subgrid[0];
+        
+        Subgrid[] subgrid = new Subgrid[size];
+        int subDimY = (int) Math.sqrt(size);
+        
+        if (subDimY == 0 || size % subDimY != 0) {
+             System.err.println("Warning: Grid size is not a perfect square, subgrid validation may be inaccurate.");
+             return new Subgrid[0];
+        }
+        int subDimX = size / subDimY;
+        
+        for (int ctr = 0, xCount = 0; ctr < size; ctr++, xCount++) {
+            subgrid[ctr] = new Subgrid(xCount * subDimX, ((ctr / subDimY) * subDimY), subDimX, subDimY);
+            if ((ctr + 1) % subDimY == 0 && ctr > 0)
+                xCount = -1;
+        }
+        return subgrid;
     }
 }
