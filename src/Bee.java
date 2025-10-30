@@ -45,7 +45,6 @@ class Bee{
                 return getPenaltySumProduct(false);
             case SUM_PRODUCT_UNCONSTRAINED:
                 return getPenaltySumProduct(true);
-            case ROW_COLUMN_CONFLICTS:
             default:
                 return getPenaltyRowColumnConflicts();
         }

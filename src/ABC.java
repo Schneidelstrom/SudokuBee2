@@ -41,11 +41,11 @@ class ABC extends Thread{
 			//employed bee phase
 			for (int i = 0; i < bee.length && maxFit != 1; i++) {
 				double oldFitness = bee[i].getFitness();
-				System.out.println("  [Employed Bee " + i + "] Current Fitness: " + String.format("%.5f", oldFitness));
+				//System.out.println("  [Employed Bee " + i + "] Current Fitness: " + String.format("%.5f", oldFitness));
 				v = neighborhoodSearch(i); // neighborhood search
 				bee[i] = greedy.greedySearch(bee[i], v); //greedy
 				if (bee[i].getFitness() > oldFitness)
-					System.out.println("    -> IMPROVED Fitness to: " + String.format("%.5f", bee[i].getFitness()));
+					//System.out.println("    -> IMPROVED Fitness to: " + String.format("%.5f", bee[i].getFitness()));
 				beeFitness = bee[i].getFitness();
 				maxFit = getMaxFit(maxFit, beeFitness, i); //storing of bestbee
 				sumFitness = sumFitness + beeFitness;
@@ -57,7 +57,7 @@ class ABC extends Thread{
 				int maxOnlooker = (int) ((probability) * onlookerSize);
 
 				if (maxOnlooker > 0)
-					System.out.println("  [Onlooker Bees] Visiting Bee " + i + " (" + maxOnlooker + " times)");
+					//System.out.println("  [Onlooker Bees] Visiting Bee " + i + " (" + maxOnlooker + " times)");
 
 				for (int count = 0; count < maxOnlooker; count++) {
 					double oldFitness = bee[i].getFitness();
@@ -65,8 +65,7 @@ class ABC extends Thread{
 					bee[i] = greedy.greedySearch(bee[i], v); //greedy
 
 					if (bee[i].getFitness() > oldFitness)
-						System.out.println(
-								"    -> Onlooker IMPROVED Fitness to: " + String.format("%.5f", bee[i].getFitness()));
+						//System.out.println("    -> Onlooker IMPROVED Fitness to: " + String.format("%.5f", bee[i].getFitness()));
 
 					maxFit = getMaxFit(maxFit, bee[i].getFitness(), i); //storing of best bee
 				}
@@ -99,12 +98,10 @@ class ABC extends Thread{
 
 				for (int i = 0; i < scoutSize && maxFit != 1; i++) {
 					int beeIndexToReplace = minSet[i];
-					System.out.println("  [Scout Bee] Replacing weak bee at index " + beeIndexToReplace + " (Fitness: "
-							+ String.format("%.4f", bee[beeIndexToReplace].getFitness()) + ")");
+					//System.out.println("  [Scout Bee] Replacing weak bee at index " + beeIndexToReplace + " (Fitness: " + String.format("%.4f", bee[beeIndexToReplace].getFitness()) + ")");
 					v = new Bee(getProblemCopy(), subgrid, this.penaltyType); //generating of new Solution
 					bee[minSet[i]] = greedy.greedySearch(bee[minSet[i]], v); //greedy
-					System.out.println("    -> New scout bee generated with Fitness: "
-							+ String.format("%.4f", bee[minSet[i]].getFitness()));
+					//System.out.println("    -> New scout bee generated with Fitness: " + String.format("%.4f", bee[minSet[i]].getFitness()));
 					maxFit = getMaxFit(maxFit, bee[minSet[i]].getFitness(), minSet[i]); //storing of best bee
 				}
 			}
@@ -136,8 +133,9 @@ class ABC extends Thread{
 		bestBee=new Bee(subgrid, this.penaltyType);
 		for(int ctr=0; ctr<employedSize; ctr++){
 			bee[ctr]=new Bee(getProblemCopy(), subgrid, this.penaltyType);
+			int boardSize = bee[ctr].getSolution().length;
 			bee[ctr].setFitness(fit.calculateFitness(bee[ctr].getPenaltyValue()));
-			}
+		}
 		bestBee.copyProblem(bee[0].getCopy());
 		bestBee.setFitness(bee[0].getFitness());
 		//array of empty cells
@@ -191,7 +189,7 @@ class ABC extends Thread{
 		}
 	private double getMaxFit(double maxFit, double beeFitness, int i){
 		if(maxFit<=beeFitness){
-            if (beeFitness > maxFit) System.out.println("\n*** NEW BEST OVERALL SOLUTION found by Bee " + i + "! Fitness: " + String.format("%.4f", beeFitness) + " ***\n");
+            if (beeFitness > maxFit) //System.out.println("\n*** NEW BEST OVERALL SOLUTION found by Bee " + i + "! Fitness: " + String.format("%.4f", beeFitness) + " ***\n");
 			maxFit=beeFitness;
 			bestBee.copyProblem(bee[i].getCopy());
 			bestBee.setFitness(beeFitness);

@@ -1,0 +1,45 @@
+=======================================
+    SUDOKU BEE - EXPERIMENT REPORT     
+=======================================
+
+----- ALGORITHM PARAMETERS -----
+Penalty Function: SUM_PRODUCT_CONSTRAINED
+Employed Bees: 100
+Onlooker Bees: 200
+Max Cycles: 100000
+
+----- INITIAL PUZZLE -----
+ 7  5  0 |  9  8  0 |  0  0  0 
+ 6  0  0 |  0  5  0 |  0  0  8 
+ 0  0  0 |  0  0  0 |  4  2  0 
+------------------------------------
+ 0  0  0 |  3  9  5 |  0  0  0 
+ 0  2  3 |  0  0  0 |  0  8  1 
+ 0  0  0 |  8  0  0 |  0  5  0 
+------------------------------------
+ 0  0  4 |  0  0  0 |  3  0  0 
+ 0  0  0 |  0  7  9 |  0  0  0 
+ 0  0  8 |  0  0  0 |  0  1  2 
+
+
+----- EXPERIMENT RESULTS -----
+Termination Reason: Max Cycles Reached
+Final Fitness: 0.000000
+Solution Validity: INVALID
+Total Cycles Executed: 100000
+Total Runtime: 4310.332 seconds
+
+----- FINAL SOLUTION -----
+A perfect solution was not found. Displaying the best attempt:
+ 7  5  3 |  9  8  1 |  1  6  7 
+ 6  1  4 |  3  5  4 |  9  3  8 
+ 8  9  2 |  6  2  7 |  4  2  5 
+------------------------------------
+ 1  4  6 |  3  9  5 |  3  6  9 
+ 9  2  3 |  7  6  2 |  7  8  1 
+ 5  8  7 |  8  1  4 |  2  5  4 
+------------------------------------
+ 1  6  4 |  6  3  8 |  3  7  5 
+ 5  2  3 |  1  7  9 |  8  6  4 
+ 7  9  8 |  2  5  4 |  9  1  2 
+

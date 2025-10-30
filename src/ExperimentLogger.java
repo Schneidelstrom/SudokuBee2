@@ -45,7 +45,7 @@ public class ExperimentLogger {
         writer.println();
         writer.println("----- EXPERIMENT RESULTS -----");
         writer.println("Termination Reason: " + (fitness == 1.0 ? "Solution Found" : "Max Cycles Reached"));
-        writer.println("Final Fitness: " + String.format("%.6f", fitness));
+        writer.println("Final Fitness: " + String.format("%.25f", fitness));
 
         boolean isSolutionValid = validateSolution(finalSolution);
         writer.println("Solution Validity: " + (isSolutionValid ? "VALID" : "INVALID"));

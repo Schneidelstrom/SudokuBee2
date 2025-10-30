@@ -134,7 +134,7 @@ public class SudokuBee extends Thread{
         final int EMPLOYED_BEES = 100;
         final int ONLOOKER_BEES = 200;
         final int MAX_CYCLES = 100000;
-        final PenaltyType penalty = PenaltyType.ROW_COLUMN_CONFLICTS;
+        final PenaltyType penalty = PenaltyType.SUM_PRODUCT_UNCONSTRAINED;
         
         System.out.println("Using fixed penalty function: " + penalty);
 
