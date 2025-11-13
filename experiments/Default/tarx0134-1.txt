@@ -1,0 +1,44 @@
+=======================================
+    SUDOKU BEE - EXPERIMENT REPORT     
+=======================================
+
+----- ALGORITHM PARAMETERS -----
+Penalty Function: ROW_COLUMN_CONFLICTS
+Employed Bees: 100
+Onlooker Bees: 200
+Max Cycles: 100000
+
+----- INITIAL PUZZLE -----
+ 0  0  0 |  0  0  0 |  0  0  8 
+ 0  0  3 |  0  0  0 |  4  0  0 
+ 0  9  0 |  0  2  0 |  0  6  0 
+------------------------------------
+ 0  0  0 |  0  7  9 |  0  0  0 
+ 0  0  0 |  0  6  1 |  2  0  0 
+ 0  6  0 |  5  0  2 |  0  7  0 
+------------------------------------
+ 0  0  8 |  0  0  0 |  5  0  0 
+ 0  1  0 |  0  0  0 |  0  2  0 
+ 4  0  5 |  0  0  0 |  0  0  3 
+
+
+----- EXPERIMENT RESULTS -----
+Termination Reason: Solution Found
+Final Fitness: 1.000000
+Solution Validity: VALID
+Total Cycles Executed: 41086
+Total Runtime: 184.296 seconds
+
+----- FINAL SOLUTION -----
+ 6  2  1 |  9  4  3 |  7  5  8 
+ 7  8  3 |  6  1  5 |  4  9  2 
+ 5  9  4 |  7  2  8 |  3  6  1 
+------------------------------------
+ 1  4  2 |  8  7  9 |  6  3  5 
+ 3  5  7 |  4  6  1 |  2  8  9 
+ 8  6  9 |  5  3  2 |  1  7  4 
+------------------------------------
+ 2  3  8 |  1  9  7 |  5  4  6 
+ 9  1  6 |  3  5  4 |  8  2  7 
+ 4  7  5 |  2  8  6 |  9  1  3 
+
